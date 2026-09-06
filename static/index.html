@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Luxe Hair Studio — AI Support Demo</title>
+
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<div class="demo-page">
+
+    <div class="demo-notice">
+        <div class="demo-badge">DEMO</div>
+
+        <div class="demo-copy">
+            <strong>This is a demonstration website.</strong>
+            <span>You're testing a sample AI customer-support assistant configured for a fictional business.</span>
+        </div>
+
+        <details class="demo-details">
+            <summary>Before you try it</summary>
+
+            <div class="demo-info">
+                <div>
+                    <strong>What you're seeing</strong>
+                    <p>This demo shows how an AI support assistant can answer customer questions using a business-specific knowledge base.</p>
+                </div>
+
+                <div>
+                    <strong>The business is fictional</strong>
+                    <p>“Luxe Hair Studio” and its information are sample data created for demonstration purposes. Nothing here represents a real business.</p>
+                </div>
+
+                <div>
+                    <strong>Responses are AI-generated</strong>
+                    <p>The assistant can make mistakes, misunderstand questions, or provide incomplete answers. A production system would be tested and monitored before handling real customers.</p>
+                </div>
+
+                <div>
+                    <strong>Don't enter sensitive information</strong>
+                    <p>Please don't enter passwords, payment details, private customer information, or anything confidential. This is not a production customer-support channel.</p>
+                </div>
+
+                <div>
+                    <strong>This is not connected to your business</strong>
+                    <p>The demo does not access your website, CRM, inbox, orders, bookings, customer database, or internal systems. Those integrations can be added to a production deployment where appropriate.</p>
+                </div>
+
+                <div>
+                    <strong>What a real deployment can include</strong>
+                    <p>A production version can be trained on your approved business information, branded to match your website, connected to relevant tools, given escalation rules, and configured around your support workflow.</p>
+                </div>
+
+                <div>
+                    <strong>What to test</strong>
+                    <p>Try common customer questions, unusual questions, follow-ups, pricing questions, policy questions, and questions the assistant should not be able to answer. The goal is to see how the experience feels—not to treat every answer as authoritative.</p>
+                </div>
+
+                <div>
+                    <strong>Important</strong>
+                    <p>This demo is intended for evaluation only. Any production implementation should use appropriate security, privacy, data-retention, access-control, monitoring, and human-escalation practices.</p>
+                </div>
+            </div>
+        </details>
+    </div>
+
+    <div class="chat-wrapper">
+
+        <div class="chat-header">
+            <div class="business-icon">L</div>
+
+            <div>
+                <div class="business-name">
+                    Luxe Hair Studio
+                </div>
+
+                <div class="status">
+                    <span></span>
+                    Demo assistant
+                </div>
+            </div>
+        </div>
+
+
+        <div id="messages" class="messages">
+
+            <div class="message assistant">
+                Hi! 👋 How can I help you with Luxe Hair Studio?
+            </div>
+
+        </div>
+
+
+        <div class="input-area">
+
+            <textarea
+                id="message"
+                placeholder="Ask us anything about our services..."
+                rows="1"
+            ></textarea>
+
+            <button id="send">
+                Send
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="demo-footer">
+        <span>Demo environment · Sample business data · AI-generated responses</span>
+        <span>Do not enter sensitive or confidential information.</span>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+<script src="/app.js"></script>
+
+</body>
+</html>
