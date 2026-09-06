@@ -18,15 +18,14 @@
             <summary>Before you try it</summary>
             <div class="demo-info">
                 <div><strong>The business is fictional</strong><p>“Luxe Hair Studio” and its information are sample data created for demonstration purposes.</p></div>
-                <div><strong>Bookings are simulated</strong><p>Appointments use a demo booking database. If Google Calendar is configured by the owner, confirmed appointments are also written to that calendar.</p></div>
-                <div><strong>AI-generated responses</strong><p>The assistant can make mistakes. Never enter passwords, payment details, or confidential information.</p></div>
-                <div><strong>Anti-abuse controls are enabled</strong><p>The demo limits requests, prevents duplicate/overlapping appointments, limits upcoming bookings per customer/network, and validates every booking server-side.</p></div>
-                <div><strong>What to test</strong><p>Ask about services, prices and hours, then try “I'd like to book a women's haircut tomorrow afternoon.” The assistant will check live availability before booking.</p></div>
+                <div><strong>Bookings are handled by the AI</strong><p>There is no direct booking form. The assistant checks the business Google Calendar before confirming an appointment.</p></div>
+                <div><strong>Required details</strong><p>To book, the assistant needs your name, email, phone number, service and preferred date and time.</p></div>
+                <div><strong>What to test</strong><p>Ask about services, prices and hours, then say “I'd like to book a women's haircut tomorrow afternoon.”</p></div>
             </div>
         </details>
     </div>
 
-    <div class="workspace">
+    <div class="workspace single-chat">
         <div class="chat-wrapper">
             <div class="chat-header">
                 <div class="business-icon">L</div>
@@ -37,7 +36,7 @@
             </div>
 
             <div id="messages" class="messages">
-                <div class="message assistant">Hi! 👋 I can answer questions about Luxe Hair Studio and help you check or book an appointment.</div>
+                <div class="message assistant">Hi! 👋 I can answer questions about Luxe Hair Studio and help you book an appointment.</div>
             </div>
 
             <div class="input-area">
@@ -45,49 +44,11 @@
                 <button id="send">Send</button>
             </div>
         </div>
-
-        <aside class="booking-card">
-            <div class="booking-card-header">
-                <div>
-                    <div class="eyebrow">DIRECT BOOKING</div>
-                    <h2>Book an appointment</h2>
-                </div>
-                <div id="calendarStatus" class="sync-pill">Demo calendar</div>
-            </div>
-
-            <form id="bookingForm">
-                <label>Name<input id="bookingName" required maxlength="100" autocomplete="name"></label>
-                <label>Email<input id="bookingEmail" type="email" required maxlength="254" autocomplete="email"></label>
-                <label>Phone <span>(optional)</span><input id="bookingPhone" maxlength="30" autocomplete="tel"></label>
-                <label>Service
-                    <select id="bookingService" required>
-                        <option>Women's Haircut</option>
-                        <option>Men's Haircut</option>
-                        <option>Children's Haircut</option>
-                        <option>Blowout</option>
-                        <option>Full Colour</option>
-                        <option>Highlights</option>
-                        <option>Balayage</option>
-                        <option>Hair Treatment</option>
-                        <option>Bridal Styling</option>
-                    </select>
-                </label>
-                <label>Date<input id="bookingDate" type="date" required></label>
-                <label>Available time
-                    <select id="bookingTime" required disabled><option>Select a date first</option></select>
-                </label>
-                <input id="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="honeypot">
-                <button class="primary-button" id="bookButton" type="submit">Check & book</button>
-                <div id="bookingMessage" class="booking-message" role="status"></div>
-            </form>
-
-            <div class="booking-note">Appointments are subject to the business's live calendar and demo anti-abuse limits.</div>
-        </aside>
     </div>
 
     <div class="demo-footer">
         <span>Demo environment · Sample business data · AI-generated responses</span>
-        <span><a href="/calendar.html">Owner calendar</a> · Do not enter sensitive information.</span>
+        <span>Bookings are checked against Google Calendar · Do not enter sensitive information.</span>
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
