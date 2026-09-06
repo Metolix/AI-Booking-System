@@ -1,2 +1,2 @@
-# AI-Customer-Support
-AI Customer support chat bot
+# AI Booking System
+AI Customer support and booking system
