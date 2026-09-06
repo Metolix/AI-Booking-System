@@ -3,124 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Luxe Hair Studio — AI Support Demo</title>
-
+    <title>Luxe Hair Studio — AI Support & Booking Demo</title>
     <link rel="stylesheet" href="/style.css">
 </head>
-
 <body>
-
 <div class="demo-page">
-
     <div class="demo-notice">
         <div class="demo-badge">DEMO</div>
-
         <div class="demo-copy">
             <strong>This is a demonstration website.</strong>
-            <span>You're testing a sample AI customer-support assistant configured for a fictional business.</span>
+            <span>You're testing a sample AI customer-support and appointment-booking assistant for a fictional business.</span>
         </div>
-
         <details class="demo-details">
             <summary>Before you try it</summary>
-
             <div class="demo-info">
-                <div>
-                    <strong>What you're seeing</strong>
-                    <p>This demo shows how an AI support assistant can answer customer questions using a business-specific knowledge base.</p>
-                </div>
-
-                <div>
-                    <strong>The business is fictional</strong>
-                    <p>“Luxe Hair Studio” and its information are sample data created for demonstration purposes. Nothing here represents a real business.</p>
-                </div>
-
-                <div>
-                    <strong>Responses are AI-generated</strong>
-                    <p>The assistant can make mistakes, misunderstand questions, or provide incomplete answers. A production system would be tested and monitored before handling real customers.</p>
-                </div>
-
-                <div>
-                    <strong>Don't enter sensitive information</strong>
-                    <p>Please don't enter passwords, payment details, private customer information, or anything confidential. This is not a production customer-support channel.</p>
-                </div>
-
-                <div>
-                    <strong>This is not connected to your business</strong>
-                    <p>The demo does not access your website, CRM, inbox, orders, bookings, customer database, or internal systems. Those integrations can be added to a production deployment where appropriate.</p>
-                </div>
-
-                <div>
-                    <strong>What a real deployment can include</strong>
-                    <p>A production version can be trained on your approved business information, branded to match your website, connected to relevant tools, given escalation rules, and configured around your support workflow.</p>
-                </div>
-
-                <div>
-                    <strong>What to test</strong>
-                    <p>Try common customer questions, unusual questions, follow-ups, pricing questions, policy questions, and questions the assistant should not be able to answer. The goal is to see how the experience feels—not to treat every answer as authoritative.</p>
-                </div>
-
-                <div>
-                    <strong>Important</strong>
-                    <p>This demo is intended for evaluation only. Any production implementation should use appropriate security, privacy, data-retention, access-control, monitoring, and human-escalation practices.</p>
-                </div>
+                <div><strong>The business is fictional</strong><p>“Luxe Hair Studio” and its information are sample data created for demonstration purposes.</p></div>
+                <div><strong>Bookings are simulated</strong><p>Appointments use a demo booking database. If Google Calendar is configured by the owner, confirmed appointments are also written to that calendar.</p></div>
+                <div><strong>AI-generated responses</strong><p>The assistant can make mistakes. Never enter passwords, payment details, or confidential information.</p></div>
+                <div><strong>Anti-abuse controls are enabled</strong><p>The demo limits requests, prevents duplicate/overlapping appointments, limits upcoming bookings per customer/network, and validates every booking server-side.</p></div>
+                <div><strong>What to test</strong><p>Ask about services, prices and hours, then try “I'd like to book a women's haircut tomorrow afternoon.” The assistant will check live availability before booking.</p></div>
             </div>
         </details>
     </div>
 
-    <div class="chat-wrapper">
-
-        <div class="chat-header">
-            <div class="business-icon">L</div>
-
-            <div>
-                <div class="business-name">
-                    Luxe Hair Studio
+    <div class="workspace">
+        <div class="chat-wrapper">
+            <div class="chat-header">
+                <div class="business-icon">L</div>
+                <div>
+                    <div class="business-name">Luxe Hair Studio</div>
+                    <div class="status"><span></span>Demo assistant</div>
                 </div>
+            </div>
 
-                <div class="status">
-                    <span></span>
-                    Demo assistant
-                </div>
+            <div id="messages" class="messages">
+                <div class="message assistant">Hi! 👋 I can answer questions about Luxe Hair Studio and help you check or book an appointment.</div>
+            </div>
+
+            <div class="input-area">
+                <textarea id="message" placeholder="Ask about services or say “I'd like to book an appointment”..." rows="1"></textarea>
+                <button id="send">Send</button>
             </div>
         </div>
 
-
-        <div id="messages" class="messages">
-
-            <div class="message assistant">
-                Hi! 👋 How can I help you with Luxe Hair Studio?
+        <aside class="booking-card">
+            <div class="booking-card-header">
+                <div>
+                    <div class="eyebrow">DIRECT BOOKING</div>
+                    <h2>Book an appointment</h2>
+                </div>
+                <div id="calendarStatus" class="sync-pill">Demo calendar</div>
             </div>
 
-        </div>
+            <form id="bookingForm">
+                <label>Name<input id="bookingName" required maxlength="100" autocomplete="name"></label>
+                <label>Email<input id="bookingEmail" type="email" required maxlength="254" autocomplete="email"></label>
+                <label>Phone <span>(optional)</span><input id="bookingPhone" maxlength="30" autocomplete="tel"></label>
+                <label>Service
+                    <select id="bookingService" required>
+                        <option>Women's Haircut</option>
+                        <option>Men's Haircut</option>
+                        <option>Children's Haircut</option>
+                        <option>Blowout</option>
+                        <option>Full Colour</option>
+                        <option>Highlights</option>
+                        <option>Balayage</option>
+                        <option>Hair Treatment</option>
+                        <option>Bridal Styling</option>
+                    </select>
+                </label>
+                <label>Date<input id="bookingDate" type="date" required></label>
+                <label>Available time
+                    <select id="bookingTime" required disabled><option>Select a date first</option></select>
+                </label>
+                <input id="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="honeypot">
+                <button class="primary-button" id="bookButton" type="submit">Check & book</button>
+                <div id="bookingMessage" class="booking-message" role="status"></div>
+            </form>
 
-
-        <div class="input-area">
-
-            <textarea
-                id="message"
-                placeholder="Ask us anything about our services..."
-                rows="1"
-            ></textarea>
-
-            <button id="send">
-                Send
-            </button>
-
-        </div>
-
+            <div class="booking-note">Appointments are subject to the business's live calendar and demo anti-abuse limits.</div>
+        </aside>
     </div>
 
     <div class="demo-footer">
         <span>Demo environment · Sample business data · AI-generated responses</span>
-        <span>Do not enter sensitive or confidential information.</span>
+        <span><a href="/calendar.html">Owner calendar</a> · Do not enter sensitive information.</span>
     </div>
-
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
 <script src="/app.js"></script>
-
 </body>
 </html>
