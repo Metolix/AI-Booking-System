@@ -128,6 +128,19 @@ def _active_counts(conn, email: str, iph: str) -> tuple[int, int]:
     return email_count, ip_count
 
 
+def _google_conflict(start: datetime, end: datetime) -> bool:
+    try:
+        from .calendar import google_busy, google_enabled
+        if not google_enabled():
+            return False
+        return any(
+            start < busy_end and end > busy_start
+            for busy_start, busy_end in google_busy(start - timedelta(minutes=1), end + timedelta(minutes=1))
+        )
+    except Exception:
+        return False
+
+
 def available_slots(date_text: str, duration: int = 30) -> list[str]:
     try:
         day = datetime.strptime(date_text, "%Y-%m-%d").date()
@@ -154,6 +167,13 @@ def available_slots(date_text: str, duration: int = 30) -> list[str]:
         ).fetchall()
 
     busy = [(_parse_local(r["start_at"]), _parse_local(r["end_at"])) for r in rows]
+
+    try:
+        from .calendar import google_busy, google_enabled
+        if google_enabled():
+            busy.extend(google_busy(cursor, closing))
+    except Exception:
+        pass
 
     while cursor + timedelta(minutes=duration) <= closing:
         end = cursor + timedelta(minutes=duration)
@@ -191,6 +211,8 @@ def create_booking(*, name: str, email: str, phone: str, service: str, start_at:
         raise ValueError("Appointments must start on a 15-minute interval.")
     if not _is_open(start, end):
         raise ValueError("That time is outside the business hours.")
+    if _google_conflict(start, end):
+        raise ValueError("That time is no longer available. Please choose another slot.")
 
     iph = ip_hash(ip)
     booking_id = str(uuid.uuid4())
@@ -244,6 +266,11 @@ def create_booking(*, name: str, email: str, phone: str, service: str, start_at:
 def set_google_event_id(booking_id: str, event_id: str):
     with _connect() as conn:
         conn.execute("UPDATE bookings SET google_event_id=? WHERE id=?", (event_id, booking_id))
+
+
+def delete_booking(booking_id: str):
+    with _connect() as conn:
+        conn.execute("DELETE FROM bookings WHERE id=?", (booking_id,))
 
 
 def list_bookings(limit: int = 100) -> list[dict]:
