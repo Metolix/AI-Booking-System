@@ -163,7 +163,7 @@ def available_slots(date_text: str, duration: int = 30) -> list[str]:
     with _connect() as conn:
         rows = conn.execute(
             "SELECT start_at, end_at FROM bookings WHERE status='confirmed' AND end_at>? AND start_at<?",
-            (cursor.isoformat(), closing.isoformat()),
+            (cursor.astimezone(timezone.utc).isoformat(), closing.astimezone(timezone.utc).isoformat()),
         ).fetchall()
 
     busy = [(_parse_local(r["start_at"]), _parse_local(r["end_at"])) for r in rows]
@@ -216,6 +216,8 @@ def create_booking(*, name: str, email: str, phone: str, service: str, start_at:
 
     iph = ip_hash(ip)
     booking_id = str(uuid.uuid4())
+    start_utc = start.astimezone(timezone.utc).isoformat()
+    end_utc = end.astimezone(timezone.utc).isoformat()
 
     with _connect() as conn:
         email_count, ip_count = _active_counts(conn, email, iph)
@@ -226,7 +228,7 @@ def create_booking(*, name: str, email: str, phone: str, service: str, start_at:
 
         duplicate = conn.execute(
             "SELECT id FROM bookings WHERE email=? AND start_at=? AND status='confirmed'",
-            (email, start.isoformat()),
+            (email, start_utc),
         ).fetchone()
         if duplicate:
             raise ValueError("You already have an appointment at that time.")
@@ -240,8 +242,8 @@ def create_booking(*, name: str, email: str, phone: str, service: str, start_at:
                     email,
                     phone,
                     service,
-                    start.isoformat(),
-                    end.isoformat(),
+                    start_utc,
+                    end_utc,
                     iph,
                     session_id,
                     "confirmed",
