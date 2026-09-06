@@ -1,10 +1,12 @@
 from pathlib import Path
+import hmac
 import os
 import uuid
+from datetime import datetime, timezone
 
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -113,12 +115,15 @@ def book(request: Request, payload: BookingRequest, response: Response):
             ip=ip,
             session_id=session_id,
         )
-        try:
-            event_id = create_google_event(booking)
-        except Exception:
-            delete_booking(booking["id"])
-            raise HTTPException(status_code=503, detail="The business calendar is temporarily unavailable. Please try another time.")
-        if event_id:
+        if google_enabled():
+            try:
+                event_id = create_google_event(booking)
+            except Exception:
+                delete_booking(booking["id"])
+                raise HTTPException(status_code=503, detail="The business calendar is temporarily unavailable. Please try another time.")
+            if not event_id:
+                delete_booking(booking["id"])
+                raise HTTPException(status_code=503, detail="The business calendar could not confirm the appointment. Please try another time.")
             set_google_event_id(booking["id"], event_id)
             booking["calendar_synced"] = True
         else:
@@ -133,15 +138,16 @@ def book(request: Request, payload: BookingRequest, response: Response):
 def calendar_ics(request: Request):
     events = []
     for booking in list_bookings(250):
-        start = booking["start_at"].replace("+00:00", "Z").replace("-", "").replace(":", "")
-        end = booking["end_at"].replace("+00:00", "Z").replace("-", "").replace(":", "")
+        start = datetime.fromisoformat(booking["start_at"]).astimezone(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        end = datetime.fromisoformat(booking["end_at"]).astimezone(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         uid = f"{booking['id']}@ai-booking-demo"
+        summary = booking["service"].replace("\\", "\\\\").replace(";", "\\;").replace(",", "\\,")
         events.append(
             "BEGIN:VEVENT\r\n"
             f"UID:{uid}\r\n"
             f"DTSTART:{start}\r\n"
             f"DTEND:{end}\r\n"
-            f"SUMMARY:{booking['service']} — {booking['name']}\r\n"
+            f"SUMMARY:{summary} — {booking['name']}\r\n"
             "END:VEVENT\r\n"
         )
     body = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//AI Booking System//EN\r\n" + "".join(events) + "END:VCALENDAR\r\n"
@@ -151,9 +157,9 @@ def calendar_ics(request: Request):
 @app.get("/api/admin/bookings")
 @limiter.limit("30/minute")
 def admin_bookings(request: Request):
-    expected = os.getenv("ADMIN_TOKEN")
-    supplied = request.headers.get("X-Admin-Token")
-    if not expected or not supplied or supplied != expected:
+    expected = os.getenv("ADMIN_TOKEN", "")
+    supplied = request.headers.get("X-Admin-Token", "")
+    if not expected or not supplied or not hmac.compare_digest(supplied, expected):
         raise HTTPException(status_code=401, detail="Unauthorized")
     return {"bookings": list_bookings(250)}
 
