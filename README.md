@@ -2,37 +2,34 @@
 
 Fictional AI customer-support and appointment-booking demo.
 
-## Features
+## How bookings work
 
-- Groq-powered customer support with live availability and booking tool use.
-- Server-side SQLite booking store with overlap protection.
-- Google Calendar sync is optional and disabled unless configured.
-- Per-IP request limits, per-email booking limits, per-network booking limits, duplicate protection and honeypot protection.
-- Server-side validation of service, date, time, business hours and booking horizon.
-- Secure session cookie and security headers.
-- Protected owner calendar view at `/calendar.html`.
-- Calendar export at `/api/calendar.ics`.
+Bookings are handled only through the AI chat.
 
-## Recommended Groq model
+Before confirming an appointment, the AI:
 
-Set `GROQ_MODEL=openai/gpt-oss-120b`. It supports tool use and structured outputs and is the strongest fit here. GPT-OSS 20B is a cheaper/faster alternative for a lightweight demo.
+- checks the requested date against the business's opening hours;
+- checks Google Calendar for existing events that overlap the requested appointment;
+- requires the customer's name, email, phone number, service and appointment time;
+- creates the appointment directly in Google Calendar only after validation succeeds.
 
-## Environment
+There is no separate booking database, direct booking form, local owner calendar or calendar export.
+
+## Google Calendar setup
+
+Google Calendar is required for booking. Set:
 
 ```env
 GROQ_API_KEY=your_groq_key
 GROQ_MODEL=openai/gpt-oss-120b
-ADMIN_TOKEN=choose-a-long-random-value
 ALLOWED_ORIGINS=https://your-demo-domain.example
-
-# Optional Google Calendar sync
 GOOGLE_CALENDAR_ID=your_calendar_id
 GOOGLE_SERVICE_ACCOUNT_JSON={...service-account-json...}
 ```
 
-For Google Calendar sync, create a Google Cloud project, enable the Calendar API, create a service account, and share the business calendar with the service account email with permission to manage events. Keep the service-account JSON secret out of Git. Google documents the Calendar API and authentication setup in its official developer documentation.
+Create a Google Cloud project, enable the Google Calendar API, create a service account, and share the business calendar with that service account with permission to manage events. Keep the service-account JSON out of Git.
 
-If Google Calendar is not configured, the demo still works using its local calendar database and owner calendar page.
+If Google Calendar is not configured, the AI can still answer business questions but cannot check availability or create appointments.
 
 ## Run
 
@@ -41,4 +38,4 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-This repository contains fictional business data and is not a production booking service. A real deployment should add customer email verification, bot challenges/CAPTCHA where appropriate, persistent production storage, audit logging, staff authentication, backups, cancellation/rescheduling workflows, and a proper OAuth-based Google Calendar connection when customer accounts need to authorize access.
+This repository uses fictional business data for demonstration purposes.
