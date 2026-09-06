@@ -4,7 +4,7 @@ import re
 from groq import Groq
 
 from .config import GROQ_API_KEY, GROQ_MODEL
-from .bookings import available_slots, create_booking, service_duration
+from .bookings import available_slots, create_booking, service_duration, delete_booking
 from .calendar import create_google_event, google_busy, google_enabled
 
 client = Groq(api_key=GROQ_API_KEY)
@@ -95,7 +95,7 @@ def _tool_result(name, arguments, *, ip, session_id):
         duration = service_duration(service)
         slots = available_slots(date, duration)
         if google_enabled() and slots:
-            from datetime import datetime
+            from datetime import datetime, timedelta
             from zoneinfo import ZoneInfo
             tz = ZoneInfo("America/Toronto")
             day_start = datetime.fromisoformat(f"{date}T00:00:00").replace(tzinfo=tz)
@@ -104,7 +104,7 @@ def _tool_result(name, arguments, *, ip, session_id):
             filtered = []
             for value in slots:
                 start = datetime.fromisoformat(value)
-                end = start.fromtimestamp(start.timestamp() + duration * 60, tz)
+                end = start + timedelta(minutes=duration)
                 if not any(start < busy_end and end > busy_start for busy_start, busy_end in busy):
                     filtered.append(value)
             slots = filtered
@@ -120,11 +120,15 @@ def _tool_result(name, arguments, *, ip, session_id):
             ip=ip,
             session_id=session_id,
         )
-        try:
-            event_id = create_google_event(booking)
-        except Exception:
-            event_id = None
-        if event_id:
+        if google_enabled():
+            try:
+                event_id = create_google_event(booking)
+            except Exception:
+                delete_booking(booking["id"])
+                raise ValueError("The business calendar is temporarily unavailable. No appointment was created.")
+            if not event_id:
+                delete_booking(booking["id"])
+                raise ValueError("The business calendar could not confirm the appointment. No appointment was created.")
             from .bookings import set_google_event_id
             set_google_event_id(booking["id"], event_id)
             booking["calendar_synced"] = True
@@ -139,23 +143,24 @@ def generate_response(conversation, *, ip="0.0.0.0", session_id=""):
     messages = [{"role": "system", "content": SYSTEM_PROMPT}, *conversation]
 
     for _ in range(4):
-        response = client.chat.completions.create(
-            model=GROQ_MODEL,
-            messages=messages,
-            tools=TOOLS,
-            tool_choice="auto",
-            temperature=0.15,
-            max_tokens=500,
-            parallel_tool_calls=False,
-            reasoning_format="hidden" if GROQ_MODEL.startswith("openai/gpt-oss") else None,
-        )
+        kwargs = {
+            "model": GROQ_MODEL,
+            "messages": messages,
+            "tools": TOOLS,
+            "tool_choice": "auto",
+            "temperature": 0.15,
+            "max_tokens": 500,
+            "parallel_tool_calls": False,
+        }
+        if GROQ_MODEL.startswith("openai/gpt-oss"):
+            kwargs["reasoning_format"] = "hidden"
 
+        response = client.chat.completions.create(**kwargs)
         message = response.choices[0].message
         if not message.tool_calls:
             return clean_response(message.content or "")
 
         messages.append(message)
-
         for tool_call in message.tool_calls:
             try:
                 arguments = json.loads(tool_call.function.arguments or "{}")
@@ -164,14 +169,11 @@ def generate_response(conversation, *, ip="0.0.0.0", session_id=""):
                 result = {"error": str(exc)}
             except Exception:
                 result = {"error": "The booking system could not complete that request right now."}
-
-            messages.append(
-                {
-                    "role": "tool",
-                    "tool_call_id": tool_call.id,
-                    "name": tool_call.function.name,
-                    "content": json.dumps(result, default=str),
-                }
-            )
+            messages.append({
+                "role": "tool",
+                "tool_call_id": tool_call.id,
+                "name": tool_call.function.name,
+                "content": json.dumps(result, default=str),
+            })
 
     return "I couldn't complete that booking request. Please try again with a specific date and time."
