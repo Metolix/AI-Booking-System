@@ -9,9 +9,14 @@ Bookings are handled only through the AI chat.
 Before confirming an appointment, the AI:
 
 - checks the requested date against the business's opening hours;
-- checks Google Calendar for existing events that overlap the requested appointment;
+- reads the selected service's duration from `data/services.json`;
+- checks Google Calendar for existing events that overlap the full service duration;
 - requires the customer's name, email, phone number, service and appointment time;
 - creates the appointment directly in Google Calendar only after validation succeeds.
+
+Service durations are maintained separately in `data/services.json`, so changing a service's duration does not require changing the booking logic.
+
+Google Calendar events use the title format `Appointment - (service)` and store the customer's name, email, phone, service, duration, start time and end time in the event description.
 
 There is no separate booking database, direct booking form, local owner calendar or calendar export.
 
