@@ -81,7 +81,6 @@ def create_google_event(booking: dict) -> str | None:
         ),
         "start": {"dateTime": booking["start_at"], "timeZone": "America/Toronto"},
         "end": {"dateTime": booking["end_at"], "timeZone": "America/Toronto"},
-        "attendees": [{"email": booking["email"]}],
     }
-    created = service.events().insert(calendarId=calendar_id, body=event, sendUpdates="all").execute()
+    created = service.events().insert(calendarId=calendar_id, body=event).execute()
     return created.get("id")
