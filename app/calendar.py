@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import datetime, time, timedelta
+from datetime import datetime, time
 from zoneinfo import ZoneInfo
 
 TZ = ZoneInfo("America/Toronto")
@@ -69,10 +69,19 @@ def create_google_event(booking: dict) -> str | None:
         raise ValueError("Google Calendar is not configured.")
 
     event = {
-        "summary": f"{booking['service']} — {booking['name']}",
-        "description": f"Customer email: {booking['email']}\nCustomer phone: {booking['phone']}",
+        "summary": f"Appointment - {booking['service']}",
+        "description": (
+            f"Customer Name: {booking['name']}\n"
+            f"Customer Email: {booking['email']}\n"
+            f"Customer Phone: {booking['phone']}\n"
+            f"Service: {booking['service']}\n"
+            f"Duration: {booking['duration_minutes']} minutes\n"
+            f"Start: {booking['start_at']}\n"
+            f"End: {booking['end_at']}"
+        ),
         "start": {"dateTime": booking["start_at"], "timeZone": "America/Toronto"},
         "end": {"dateTime": booking["end_at"], "timeZone": "America/Toronto"},
+        "attendees": [{"email": booking["email"]}],
     }
-    created = service.events().insert(calendarId=calendar_id, body=event).execute()
+    created = service.events().insert(calendarId=calendar_id, body=event, sendUpdates="all").execute()
     return created.get("id")
