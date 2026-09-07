@@ -1,24 +1,19 @@
 from __future__ import annotations
 
+import json
 import re
 from datetime import datetime, timedelta
+from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from .calendar import google_busy, google_enabled
 
 TZ = ZoneInfo("America/Toronto")
-
+BASE_DIR = Path(__file__).resolve().parent.parent
+SERVICES_FILE = BASE_DIR / "data" / "services.json"
 SERVICES = {
-    "women's haircut": 45,
-    "men's haircut": 30,
-    "children's haircut": 30,
-    "blowout": 45,
-    "full colour": 120,
-    "full color": 120,
-    "highlights": 150,
-    "balayage": 180,
-    "hair treatment": 45,
-    "bridal styling": 120,
+    name.lower(): int(config["duration_minutes"])
+    for name, config in json.loads(SERVICES_FILE.read_text(encoding="utf-8"))["services"].items()
 }
 
 HOURS = {
@@ -142,6 +137,7 @@ def validate_booking(*, name: str, email: str, phone: str, service: str, start_a
         "email": email,
         "phone": phone,
         "service": service,
+        "duration_minutes": duration,
         "start_at": start.isoformat(),
         "end_at": end.isoformat(),
     }
