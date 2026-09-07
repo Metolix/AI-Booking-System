@@ -1,0 +1,14 @@
+{
+  "services": {
+    "women's haircut": {"duration_minutes": 45},
+    "men's haircut": {"duration_minutes": 30},
+    "children's haircut": {"duration_minutes": 30},
+    "blowout": {"duration_minutes": 45},
+    "full colour": {"duration_minutes": 120},
+    "full color": {"duration_minutes": 120},
+    "highlights": {"duration_minutes": 150},
+    "balayage": {"duration_minutes": 180},
+    "hair treatment": {"duration_minutes": 45},
+    "bridal styling": {"duration_minutes": 120}
+  }
+}
