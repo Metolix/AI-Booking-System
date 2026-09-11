@@ -101,6 +101,7 @@ sendCodeButton.addEventListener("click", async () => {
         bookingDetails.hidden = true;
         otpStep.hidden = false;
         code.value = "";
+        confirmButton.disabled = false;
         code.focus();
         setMessage("Verification code sent. Check your email.");
     } catch (error) {
@@ -112,6 +113,8 @@ sendCodeButton.addEventListener("click", async () => {
 backButton.addEventListener("click", () => {
     otpStep.hidden = true;
     bookingDetails.hidden = false;
+    confirmButton.disabled = false;
+    code.value = "";
     setMessage("You can change your booking details and request a new code.");
     sendCodeButton.disabled = !time.value;
 });
@@ -137,7 +140,12 @@ form.addEventListener("submit", async event => {
             body: JSON.stringify({ ...bookingPayload(), code: enteredCode })
         });
         const data = await response.json();
-        if (!response.ok) throw new Error(data.detail || "The booking could not be confirmed.");
+
+        if (!response.ok) {
+            const error = new Error(data.detail || "The booking could not be confirmed.");
+            error.status = response.status;
+            throw error;
+        }
 
         const booking = data.booking;
         setMessage(`Confirmed: ${booking.service} at ${formatTime(booking.start_at)}. A confirmation email has been sent${data.confirmation_email_sent ? "." : ", but the email could not be sent."}`);
@@ -149,7 +157,12 @@ form.addEventListener("submit", async event => {
         sendCodeButton.disabled = true;
     } catch (error) {
         setMessage(error.message, true);
-        if (!error.message.includes("attempts remaining") && !error.message.includes("Too many incorrect")) {
+
+        if (error.status === 400) {
+            confirmButton.disabled = false;
+            code.focus();
+            code.select();
+        } else {
             confirmButton.disabled = false;
         }
     }
