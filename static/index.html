@@ -3,45 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b0b0c">
     <title>Luxe Hair Studio — AI Support Demo</title>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 <div class="demo-page">
-    <div class="demo-notice">
-        <div class="demo-badge">DEMO</div>
-        <div class="demo-copy">
-            <strong>This is a demonstration website.</strong>
-            <span>The AI assistant answers questions and checks appointment availability. Bookings are completed through the booking form.</span>
+    <header class="demo-notice">
+        <div class="demo-brand">
+            <div class="demo-badge">DEMO</div>
+            <div>
+                <strong>Luxe Hair Studio</strong>
+                <span>AI support & appointment availability</span>
+            </div>
         </div>
-        <a class="book-back" href="/book">Book appointment</a>
-    </div>
+        <div class="demo-notice-copy">Ask questions, check availability, then book securely.</div>
+        <a class="book-back" href="/book">Book appointment <span>↗</span></a>
+    </header>
 
-    <div class="workspace single-chat">
-        <div class="chat-wrapper">
+    <main class="home-shell">
+        <section class="chat-wrapper" aria-label="AI support chat">
             <div class="chat-header">
                 <div class="business-icon">L</div>
-                <div>
-                    <div class="business-name">Luxe Hair Studio</div>
-                    <div class="status"><span></span>Demo assistant</div>
+                <div class="chat-title">
+                    <div class="business-name">Luxe AI Assistant</div>
+                    <div class="status"><span></span>Online · Demo assistant</div>
                 </div>
+                <div class="header-label">AI SUPPORT</div>
             </div>
 
             <div id="messages" class="messages">
-                <div class="message assistant">Hi! 👋 I can answer questions about Luxe Hair Studio and check appointment availability. Ready to book? <a href="/book">Book an appointment</a>.</div>
+                <div class="welcome-block">
+                    <div class="welcome-eyebrow">LUXE HAIR STUDIO</div>
+                    <h1>How can we help?</h1>
+                    <p>Ask about services, hours or appointment availability.</p>
+                    <div class="suggestions" aria-label="Suggested questions">
+                        <button type="button" data-message="What services do you offer?">Services</button>
+                        <button type="button" data-message="What are your opening hours?">Opening hours</button>
+                        <button type="button" data-message="What appointments are available?">Availability</button>
+                    </div>
+                </div>
+                <div class="message assistant">Hi! 👋 I can answer questions about Luxe Hair Studio and check appointment availability. When you're ready, you can <a href="/book">book an appointment</a>.</div>
             </div>
 
             <div class="input-area">
-                <textarea id="message" placeholder="Ask about services, hours or availability…" rows="1"></textarea>
-                <button id="send">Send</button>
+                <div class="input-wrap">
+                    <textarea id="message" placeholder="Ask about services, hours or availability…" rows="1" aria-label="Message"></textarea>
+                    <span class="input-hint">Enter to send · Shift + Enter for a new line</span>
+                </div>
+                <button id="send" class="send-button" type="button" aria-label="Send message">Send <span>↗</span></button>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
-    <div class="demo-footer">
+    <footer class="demo-footer">
         <span>Demo environment · Sample business data · AI-generated responses</span>
-        <span>Bookings are completed through the booking form · Do not enter sensitive information.</span>
-    </div>
+        <span>Do not enter sensitive information.</span>
+    </footer>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
