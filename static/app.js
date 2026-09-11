@@ -1,6 +1,7 @@
 const messages = document.getElementById("messages");
 const input = document.getElementById("message");
 const send = document.getElementById("send");
+const suggestions = document.querySelectorAll("[data-message]");
 
 let history = [];
 
@@ -16,12 +17,18 @@ function addMessage(text, role) {
     messages.scrollTop = messages.scrollHeight;
 }
 
+function resizeInput() {
+    input.style.height = "auto";
+    input.style.height = `${Math.min(input.scrollHeight, 130)}px`;
+}
+
 async function sendMessage() {
     const text = input.value.trim();
     if (!text || send.disabled) return;
 
     addMessage(text, "user");
     input.value = "";
+    resizeInput();
     send.disabled = true;
     input.disabled = true;
 
@@ -51,10 +58,22 @@ async function sendMessage() {
     }
 }
 
+suggestions.forEach(button => {
+    button.addEventListener("click", () => {
+        input.value = button.dataset.message;
+        resizeInput();
+        input.focus();
+        sendMessage();
+    });
+});
+
 send.addEventListener("click", sendMessage);
+input.addEventListener("input", resizeInput);
 input.addEventListener("keydown", event => {
     if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
         sendMessage();
     }
 });
+
+resizeInput();
