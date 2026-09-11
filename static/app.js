@@ -32,13 +32,18 @@ async function sendMessage() {
             body: JSON.stringify({ message: text, history: history.slice(-10) })
         });
         const data = await response.json();
-        if (!response.ok) throw new Error(data.detail || "Something went wrong.");
+        if (!response.ok) {
+            if (response.status === 429) {
+                throw new Error("You're sending messages a little too quickly. Please wait a moment and try again.");
+            }
+            throw new Error(data.detail || "Something went wrong.");
+        }
 
         addMessage(data.response, "assistant");
         history.push({ role: "user", content: text });
         history.push({ role: "assistant", content: data.response });
     } catch (error) {
-        addMessage("Sorry, I'm unable to respond right now. Please contact the business directly.", "assistant");
+        addMessage(error.message || "Sorry, I'm unable to respond right now. Please contact the business directly.", "assistant");
     } finally {
         send.disabled = false;
         input.disabled = false;
