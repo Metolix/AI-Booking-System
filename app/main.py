@@ -16,9 +16,10 @@ from .calendar import create_google_event, google_enabled
 from .email import send_confirmation, send_otp
 from .otp import COOKIE_NAME, check_resend_allowed, create_challenge, increment_attempts, read_challenge, verify_code
 from .security import check_input
+from .site_config import load_site_config
 
 limiter = Limiter(key_func=get_remote_address, default_limits=["120/minute"])
-app = FastAPI(title="Business AI Support & Booking Demo")
+app = FastAPI(title="Business AI Support & Booking Template")
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
@@ -83,6 +84,12 @@ class BookingConfirmRequest(BookingRequest):
 @limiter.limit("60/minute")
 def health(request: Request):
     return {"status": "ok", "google_calendar": google_enabled()}
+
+
+@app.get("/api/site-config")
+@limiter.limit("60/minute")
+def site_config(request: Request):
+    return load_site_config()
 
 
 @app.get("/book")
