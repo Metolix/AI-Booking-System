@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luxe Hair Studio — AI Support & Booking Demo</title>
+    <title>Luxe Hair Studio — AI Support Demo</title>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -12,17 +12,9 @@
         <div class="demo-badge">DEMO</div>
         <div class="demo-copy">
             <strong>This is a demonstration website.</strong>
-            <span>You're testing a sample AI customer-support and appointment-booking assistant for a fictional business.</span>
+            <span>The AI assistant answers questions and checks appointment availability. Bookings are completed through the booking form.</span>
         </div>
-        <details class="demo-details">
-            <summary>Before you try it</summary>
-            <div class="demo-info">
-                <div><strong>The business is fictional</strong><p>“Luxe Hair Studio” and its information are sample data created for demonstration purposes.</p></div>
-                <div><strong>Bookings are handled by the AI</strong><p>There is no direct booking form. The assistant checks the business Google Calendar before confirming an appointment.</p></div>
-                <div><strong>Required details</strong><p>To book, the assistant needs your name, email, phone number, service and preferred date and time.</p></div>
-                <div><strong>What to test</strong><p>Ask about services, prices and hours, then say “I'd like to book a women's haircut tomorrow afternoon.”</p></div>
-            </div>
-        </details>
+        <a class="book-back" href="/book">Book appointment</a>
     </div>
 
     <div class="workspace single-chat">
@@ -36,11 +28,11 @@
             </div>
 
             <div id="messages" class="messages">
-                <div class="message assistant">Hi! 👋 I can answer questions about Luxe Hair Studio and help you book an appointment.</div>
+                <div class="message assistant">Hi! 👋 I can answer questions about Luxe Hair Studio and check appointment availability. Ready to book? <a href="/book">Book an appointment</a>.</div>
             </div>
 
             <div class="input-area">
-                <textarea id="message" placeholder="Ask about services or say “I'd like to book an appointment”..." rows="1"></textarea>
+                <textarea id="message" placeholder="Ask about services, hours or availability…" rows="1"></textarea>
                 <button id="send">Send</button>
             </div>
         </div>
@@ -48,7 +40,7 @@
 
     <div class="demo-footer">
         <span>Demo environment · Sample business data · AI-generated responses</span>
-        <span>Bookings are checked against Google Calendar · Do not enter sensitive information.</span>
+        <span>Bookings are completed through the booking form · Do not enter sensitive information.</span>
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
