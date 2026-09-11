@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxe Hair Studio — Book Appointment</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="demo-page">
+    <div class="demo-notice">
+        <div class="demo-badge">DEMO</div>
+        <div class="demo-copy">
+            <strong>Luxe Hair Studio</strong>
+            <span>Choose your service, date and available time. The booking is checked against the business calendar before it is confirmed.</span>
+        </div>
+        <a class="book-back" href="/">AI assistant</a>
+    </div>
+
+    <div class="booking-page-card">
+        <div class="booking-card-header">
+            <div>
+                <div class="eyebrow">APPOINTMENT</div>
+                <h1>Book your appointment</h1>
+                <p class="booking-intro">Select an available time, then enter your contact details.</p>
+            </div>
+            <div class="sync-pill">Live calendar</div>
+        </div>
+
+        <form id="bookingForm">
+            <div class="booking-grid">
+                <label>Service
+                    <select id="service" required></select>
+                </label>
+                <label>Date
+                    <input id="date" type="date" required>
+                </label>
+            </div>
+
+            <label>Available time
+                <select id="time" required disabled>
+                    <option value="">Choose a date first</option>
+                </select>
+            </label>
+
+            <div class="booking-grid">
+                <label>Full name
+                    <input id="name" type="text" autocomplete="name" maxlength="100" required>
+                </label>
+                <label>Phone
+                    <input id="phone" type="tel" autocomplete="tel" maxlength="30" required>
+                </label>
+            </div>
+
+            <label>Email
+                <input id="email" type="email" autocomplete="email" maxlength="254" required>
+            </label>
+
+            <input id="website" class="honeypot" type="text" tabindex="-1" autocomplete="off">
+
+            <div id="bookingMessage" class="booking-message" role="status"></div>
+            <button id="bookButton" class="primary-button" type="submit" disabled>Book appointment</button>
+        </form>
+
+        <div class="booking-note">Your selected time is checked again when you submit. If someone books it first, you'll be asked to choose another available time.</div>
+    </div>
+
+    <div class="demo-footer">
+        <span>Demo environment · Sample business data</span>
+        <span><a href="/">Back to the AI assistant</a></span>
+    </div>
+</div>
+<script src="/book.js"></script>
+</body>
+</html>
