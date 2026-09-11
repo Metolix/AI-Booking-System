@@ -3,32 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b0b0c">
     <title>Luxe Hair Studio — Book Appointment</title>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-<div class="demo-page">
-    <div class="demo-notice">
-        <div class="demo-badge">DEMO</div>
-        <div class="demo-copy">
-            <strong>Luxe Hair Studio</strong>
-            <span>Choose your service, date and available time. Your email must be verified before the appointment is confirmed.</span>
+<div class="demo-page booking-page">
+    <header class="demo-notice">
+        <div class="demo-brand">
+            <div class="demo-badge">DEMO</div>
+            <div>
+                <strong>Luxe Hair Studio</strong>
+                <span>Secure appointment booking</span>
+            </div>
         </div>
-        <a class="book-back" href="/">AI assistant</a>
-    </div>
+        <div class="demo-notice-copy">Live availability · Email verification · Calendar confirmation</div>
+        <a class="book-back" href="/">AI assistant <span>↗</span></a>
+    </header>
 
-    <div class="booking-page-card">
+    <main class="booking-page-card">
         <div class="booking-card-header">
             <div>
                 <div class="eyebrow">APPOINTMENT</div>
                 <h1>Book your appointment</h1>
-                <p class="booking-intro">Select an available time, enter your details, then verify your email.</p>
+                <p class="booking-intro">Choose a service and time. We'll verify your email before confirming the appointment.</p>
             </div>
-            <div class="sync-pill">Live calendar</div>
+            <div class="sync-pill"><span></span> Live calendar</div>
+        </div>
+
+        <div class="booking-progress" aria-hidden="true">
+            <div class="progress-step active"><span>1</span><strong>Details</strong></div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span>2</span><strong>Verify</strong></div>
+            <div class="progress-line"></div>
+            <div class="progress-step"><span>3</span><strong>Confirmed</strong></div>
         </div>
 
         <form id="bookingForm">
             <div id="bookingDetails">
+                <div class="section-label">Appointment details</div>
                 <div class="booking-grid">
                     <label>Service
                         <select id="service" required></select>
@@ -44,50 +57,53 @@
                     </select>
                 </label>
 
+                <div class="section-label details-label">Your details</div>
                 <div class="booking-grid">
                     <label>Full name
-                        <input id="name" type="text" autocomplete="name" maxlength="100" required>
+                        <input id="name" type="text" autocomplete="name" maxlength="100" placeholder="Your name" required>
                     </label>
                     <label>Phone
-                        <input id="phone" type="tel" autocomplete="tel" maxlength="30" required>
+                        <input id="phone" type="tel" autocomplete="tel" maxlength="30" placeholder="Your phone number" required>
                     </label>
                 </div>
 
                 <label>Email
-                    <input id="email" type="email" autocomplete="email" maxlength="254" required>
+                    <input id="email" type="email" autocomplete="email" maxlength="254" placeholder="you@example.com" required>
                 </label>
 
                 <input id="website" class="honeypot" type="text" tabindex="-1" autocomplete="off">
-                <button id="sendCodeButton" class="primary-button" type="button" disabled>Send verification code</button>
+                <button id="sendCodeButton" class="primary-button" type="button" disabled>Continue to verification <span>→</span></button>
             </div>
 
             <div id="otpStep" hidden>
                 <div class="otp-header">
+                    <div class="otp-icon">@</div>
                     <div class="eyebrow">EMAIL VERIFICATION</div>
-                    <h2>Enter your verification code</h2>
-                    <p class="booking-intro">We sent a 6-digit code to <strong id="otpEmail"></strong>. The code expires in 10 minutes.</p>
+                    <h2>Check your inbox</h2>
+                    <p class="booking-intro">We sent a 6-digit code to <strong id="otpEmail"></strong>. It expires in 10 minutes.</p>
                 </div>
 
-                <label>Verification code
-                    <input id="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" minlength="6" required>
+                <label class="otp-label">Verification code
+                    <input id="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" minlength="6" placeholder="000000" aria-label="6-digit verification code" required>
                 </label>
 
                 <div class="otp-actions">
-                    <button id="confirmButton" class="primary-button" type="submit">Confirm appointment</button>
+                    <button id="confirmButton" class="primary-button" type="submit">Confirm appointment <span>→</span></button>
                     <button id="backButton" class="secondary-button" type="button">Change details</button>
                 </div>
+                <p class="otp-help">Didn't receive it? Check your spam folder or change your details and request a new code.</p>
             </div>
 
             <div id="bookingMessage" class="booking-message" role="status" aria-live="polite"></div>
         </form>
 
-        <div class="booking-note">The verification code is generated on the server, stored only as a protected hash, expires after 10 minutes, and is limited to 5 attempts. The calendar is checked again before the appointment is created.</div>
-    </div>
+        <div class="booking-note"><strong>Secure booking.</strong> Your verification code is protected, expires after 10 minutes, and is limited to 5 attempts. Availability is checked again before the appointment is created.</div>
+    </main>
 
-    <div class="demo-footer">
+    <footer class="demo-footer">
         <span>Demo environment · Sample business data</span>
-        <span><a href="/">Back to the AI assistant</a></span>
-    </div>
+        <span><a href="/">← Back to the AI assistant</a></span>
+    </footer>
 </div>
 <script src="/book.js"></script>
 </body>
