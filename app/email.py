@@ -28,6 +28,18 @@ def send_email(*, to: str, subject: str, body: str) -> None:
         smtp.send_message(msg)
 
 
+def send_otp(*, email: str, code: str) -> None:
+    send_email(
+        to=email,
+        subject="Your Luxe Hair Studio verification code",
+        body=(
+            "Your verification code is: " + code + "\n\n"
+            "This code expires in 10 minutes and can only be used for the booking you started.\n"
+            "If you did not request this code, you can safely ignore this email."
+        ),
+    )
+
+
 def send_confirmation(*, booking: dict) -> None:
     send_email(
         to=booking["email"],
