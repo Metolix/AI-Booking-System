@@ -11,6 +11,13 @@ const otpStep = document.getElementById("otpStep");
 const code = document.getElementById("code");
 const otpEmail = document.getElementById("otpEmail");
 
+let siteConfig = null;
+
+function getConfigValue(path, fallback) {
+    const value = path.split(".").reduce((current, key) => current?.[key], siteConfig);
+    return value ?? fallback;
+}
+
 function localDateString() {
     const now = new Date();
     const offset = now.getTimezoneOffset() * 60000;
@@ -18,7 +25,8 @@ function localDateString() {
 }
 
 function formatTime(value) {
-    return new Date(value).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    const timezone = getConfigValue("booking.timezone", undefined);
+    return new Date(value).toLocaleTimeString([], { hour: "numeric", minute: "2-digit", timeZone: timezone });
 }
 
 function setMessage(text, error = false) {
@@ -35,6 +43,20 @@ function bookingPayload() {
         start_at: time.value,
         website: document.getElementById("website").value
     };
+}
+
+async function loadSiteConfig() {
+    const response = await fetch("/api/site-config");
+    if (!response.ok) throw new Error("Unable to load site configuration.");
+    siteConfig = await response.json();
+
+    document.querySelectorAll("[data-config]").forEach(element => {
+        const value = getConfigValue(element.dataset.config, "");
+        if (value !== "") element.textContent = value;
+    });
+
+    document.title = `${getConfigValue("business.name", "Business")} — ${getConfigValue("booking.title", "Book Appointment")}`;
+    date.max = localDateString();
 }
 
 async function loadServices() {
@@ -173,9 +195,10 @@ form.addEventListener("submit", async event => {
 });
 
 (async function init() {
-    const today = localDateString();
-    date.min = today;
     try {
+        await loadSiteConfig();
+        const today = localDateString();
+        date.min = today;
         await loadServices();
         date.value = today;
         await loadSlots();
