@@ -19,7 +19,16 @@
     "verification_expiry_minutes": 10,
     "max_verification_attempts": 5,
     "max_days_ahead": 60,
-    "timezone": "America/Toronto"
+    "timezone": "America/Toronto",
+    "hours": {
+      "monday": [9, 19],
+      "tuesday": [9, 19],
+      "wednesday": [9, 19],
+      "thursday": [9, 20],
+      "friday": [9, 20],
+      "saturday": [10, 18],
+      "sunday": null
+    }
   },
   "branding": {
     "accent": "#ffffff",
