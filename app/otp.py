@@ -41,8 +41,7 @@ def _encode(data: dict) -> str:
 def _decode(value: str) -> dict:
     try:
         payload, signature = value.split(".", 1)
-        expected = _sign(payload)
-        if not hmac.compare_digest(signature, expected):
+        if not hmac.compare_digest(signature, _sign(payload)):
             raise ValueError
         data = json.loads(_unb64(payload).decode("utf-8"))
         if not isinstance(data, dict):
@@ -54,13 +53,7 @@ def _decode(value: str) -> dict:
 
 def booking_fingerprint(booking: dict) -> str:
     canonical = "|".join(
-        [
-            booking["name"],
-            booking["email"],
-            booking["phone"],
-            booking["service"],
-            booking["start_at"],
-        ]
+        [booking["name"], booking["email"], booking["phone"], booking["service"], booking["start_at"]]
     )
     return hmac.new(_secret(), canonical.encode("utf-8"), hashlib.sha256).hexdigest()
 
@@ -68,11 +61,10 @@ def booking_fingerprint(booking: dict) -> str:
 def create_challenge(booking: dict) -> tuple[str, int]:
     now = int(time.time())
     otp = f"{secrets.randbelow(1_000_000):06d}"
-    fingerprint = booking_fingerprint(booking)
     otp_hash = hmac.new(_secret(), f"otp:{otp}".encode("utf-8"), hashlib.sha256).hexdigest()
     data = {
         "id": secrets.token_urlsafe(18),
-        "fp": fingerprint,
+        "fp": booking_fingerprint(booking),
         "otp": otp_hash,
         "iat": now,
         "exp": now + OTP_TTL_SECONDS,
@@ -97,14 +89,13 @@ def check_resend_allowed(cookie_value: str | None) -> None:
         return
     try:
         data = _decode(cookie_value)
-        if int(time.time()) - int(data.get("sent", 0)) < RESEND_COOLDOWN_SECONDS:
-            raise ValueError("Please wait before requesting another verification code.")
-    except ValueError as exc:
-        if "Please wait" in str(exc):
-            raise
+    except ValueError:
+        return
+    if int(time.time()) - int(data.get("sent", 0)) < RESEND_COOLDOWN_SECONDS:
+        raise ValueError("Please wait before requesting another verification code.")
 
 
-def verify_code(data: dict, code: str, booking: dict) -> tuple[bool, dict | None]:
+def verify_code(data: dict, code: str, booking: dict) -> tuple[bool, dict]:
     if data.get("fp") != booking_fingerprint(booking):
         raise ValueError("This verification code does not match the booking details.")
 
@@ -118,19 +109,11 @@ def verify_code(data: dict, code: str, booking: dict) -> tuple[bool, dict | None
         attempts = int(data.get("attempts", 0)) + 1
         if attempts >= MAX_ATTEMPTS:
             raise ValueError("Too many incorrect verification attempts. Request a new code.")
-        updated = {**data, "attempts": attempts}
         raise ValueError(f"Incorrect verification code. {MAX_ATTEMPTS - attempts} attempts remaining.")
 
     return True, {**data, "verified": True}
 
 
-def refresh_attempts(data: dict, booking: dict, code: str) -> str:
-    try:
-        verify_code(data, code, booking)
-        return _encode({**data, "verified": True})
-    except ValueError as exc:
-        if "Incorrect verification code" not in str(exc):
-            raise
-        attempts = int(data.get("attempts", 0)) + 1
-        updated = {**data, "attempts": attempts}
-        raise ValueError(str(exc)) from exc
+def increment_attempts(data: dict) -> str:
+    updated = {**data, "attempts": int(data.get("attempts", 0)) + 1}
+    return _encode(updated)
