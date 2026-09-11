@@ -3,7 +3,7 @@ import os
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -13,7 +13,8 @@ from slowapi.util import get_remote_address
 from .ai import generate_response
 from .bookings import SERVICES, available_slots, validate_booking
 from .calendar import create_google_event, google_enabled
-from .email import send_confirmation
+from .email import send_confirmation, send_otp
+from .otp import COOKIE_NAME, check_resend_allowed, create_challenge, increment_attempts, read_challenge, verify_code
 from .security import check_input
 
 limiter = Limiter(key_func=get_remote_address, default_limits=["120/minute"])
@@ -70,6 +71,14 @@ class BookingRequest(BaseModel):
     website: str = Field(default="", max_length=200)
 
 
+class BookingCodeRequest(BookingRequest):
+    pass
+
+
+class BookingConfirmRequest(BookingRequest):
+    code: str = Field(min_length=6, max_length=6)
+
+
 @app.get("/health")
 @limiter.limit("60/minute")
 def health(request: Request):
@@ -102,34 +111,101 @@ def availability(request: Request, payload: AvailabilityRequest):
         raise HTTPException(status_code=503, detail="Availability is temporarily unavailable.")
 
 
-@app.post("/api/bookings")
-@limiter.limit("5/minute")
-def create_booking(request: Request, payload: BookingRequest):
+def _booking_from_payload(payload: BookingRequest) -> dict:
     if payload.website.strip():
-        raise HTTPException(status_code=400, detail="Unable to process this booking.")
+        raise ValueError("Unable to process this booking.")
+    return validate_booking(
+        name=payload.name,
+        email=payload.email,
+        phone=payload.phone,
+        service=payload.service,
+        start_at=payload.start_at,
+    )
+
+
+def _set_otp_cookie(response: JSONResponse, value: str, request: Request) -> None:
+    response.set_cookie(
+        key=COOKIE_NAME,
+        value=value,
+        max_age=600,
+        httponly=True,
+        secure=request.url.scheme == "https",
+        samesite="strict",
+        path="/api/bookings",
+    )
+
+
+@app.post("/api/bookings/request-code")
+@limiter.limit("3/minute")
+def request_booking_code(request: Request, payload: BookingCodeRequest):
+    try:
+        existing_cookie = request.cookies.get(COOKIE_NAME)
+        check_resend_allowed(existing_cookie)
+        booking = _booking_from_payload(payload)
+        cookie_value, code = create_challenge(booking)
+        send_otp(email=booking["email"], code=code)
+        response = JSONResponse({"status": "code_sent", "expires_in": 600})
+        _set_otp_cookie(response, cookie_value, request)
+        return response
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception:
+        raise HTTPException(status_code=503, detail="Unable to send the verification code right now.")
+
+
+@app.post("/api/bookings/confirm")
+@limiter.limit("10/minute")
+def confirm_booking(request: Request, payload: BookingConfirmRequest):
+    cookie_value = request.cookies.get(COOKIE_NAME)
+    if not cookie_value:
+        raise HTTPException(status_code=400, detail="Request a verification code first.")
 
     try:
-        booking = validate_booking(
-            name=payload.name,
-            email=payload.email,
-            phone=payload.phone,
-            service=payload.service,
-            start_at=payload.start_at,
-        )
+        challenge = read_challenge(cookie_value)
+        booking = _booking_from_payload(payload)
+        _, verified = verify_code(challenge, payload.code, booking)
+        if not verified.get("verified"):
+            raise ValueError("Verification failed.")
+
         event_id = create_google_event(booking)
         if not event_id:
             raise ValueError("The business calendar could not confirm the appointment.")
+
         confirmed = {**booking, "event_id": event_id, "status": "confirmed"}
         try:
             send_confirmation(booking=confirmed)
             email_sent = True
         except Exception:
             email_sent = False
-        return {"status": "confirmed", "booking": booking, "confirmation_email_sent": email_sent}
+
+        response = JSONResponse(
+            {
+                "status": "confirmed",
+                "booking": booking,
+                "confirmation_email_sent": email_sent,
+            }
+        )
+        response.delete_cookie(COOKIE_NAME, path="/api/bookings")
+        return response
     except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
+        message = str(exc)
+        if message.startswith("Incorrect verification code"):
+            response = JSONResponse({"detail": message}, status_code=400)
+            try:
+                response_cookie = increment_attempts(challenge)
+                _set_otp_cookie(response, response_cookie, request)
+            except Exception:
+                pass
+            return response
+        raise HTTPException(status_code=400, detail=message)
     except Exception:
         raise HTTPException(status_code=503, detail="The booking could not be completed right now.")
+
+
+@app.post("/api/bookings")
+@limiter.limit("5/minute")
+def legacy_booking_endpoint(request: Request, payload: BookingRequest):
+    raise HTTPException(status_code=410, detail="Booking now requires email verification. Use the booking form to request a code.")
 
 
 @app.post("/api/chat")
