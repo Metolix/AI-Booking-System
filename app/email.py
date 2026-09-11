@@ -28,20 +28,6 @@ def send_email(*, to: str, subject: str, body: str) -> None:
         smtp.send_message(msg)
 
 
-def send_verification_code(*, to: str, code: str) -> None:
-    send_email(
-        to=to,
-        subject="Your appointment verification code",
-        body=(
-            "Use this code to verify your appointment request:\n\n"
-            f"{code}\n\n"
-            "This code expires in 10 minutes. If you did not request an appointment, "
-            "you can safely ignore this email.\n\n"
-            "Your appointment is NOT booked until the code is verified."
-        ),
-    )
-
-
 def send_confirmation(*, booking: dict) -> None:
     send_email(
         to=booking["email"],
