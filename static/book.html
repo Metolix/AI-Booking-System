@@ -12,7 +12,7 @@
         <div class="demo-badge">DEMO</div>
         <div class="demo-copy">
             <strong>Luxe Hair Studio</strong>
-            <span>Choose your service, date and available time. The booking is checked against the business calendar before it is confirmed.</span>
+            <span>Choose your service, date and available time. Your email must be verified before the appointment is confirmed.</span>
         </div>
         <a class="book-back" href="/">AI assistant</a>
     </div>
@@ -22,47 +22,66 @@
             <div>
                 <div class="eyebrow">APPOINTMENT</div>
                 <h1>Book your appointment</h1>
-                <p class="booking-intro">Select an available time, then enter your contact details.</p>
+                <p class="booking-intro">Select an available time, enter your details, then verify your email.</p>
             </div>
             <div class="sync-pill">Live calendar</div>
         </div>
 
         <form id="bookingForm">
-            <div class="booking-grid">
-                <label>Service
-                    <select id="service" required></select>
+            <div id="bookingDetails">
+                <div class="booking-grid">
+                    <label>Service
+                        <select id="service" required></select>
+                    </label>
+                    <label>Date
+                        <input id="date" type="date" required>
+                    </label>
+                </div>
+
+                <label>Available time
+                    <select id="time" required disabled>
+                        <option value="">Choose a date first</option>
+                    </select>
                 </label>
-                <label>Date
-                    <input id="date" type="date" required>
+
+                <div class="booking-grid">
+                    <label>Full name
+                        <input id="name" type="text" autocomplete="name" maxlength="100" required>
+                    </label>
+                    <label>Phone
+                        <input id="phone" type="tel" autocomplete="tel" maxlength="30" required>
+                    </label>
+                </div>
+
+                <label>Email
+                    <input id="email" type="email" autocomplete="email" maxlength="254" required>
                 </label>
+
+                <input id="website" class="honeypot" type="text" tabindex="-1" autocomplete="off">
+                <button id="sendCodeButton" class="primary-button" type="button" disabled>Send verification code</button>
             </div>
 
-            <label>Available time
-                <select id="time" required disabled>
-                    <option value="">Choose a date first</option>
-                </select>
-            </label>
+            <div id="otpStep" hidden>
+                <div class="otp-header">
+                    <div class="eyebrow">EMAIL VERIFICATION</div>
+                    <h2>Enter your verification code</h2>
+                    <p class="booking-intro">We sent a 6-digit code to <strong id="otpEmail"></strong>. The code expires in 10 minutes.</p>
+                </div>
 
-            <div class="booking-grid">
-                <label>Full name
-                    <input id="name" type="text" autocomplete="name" maxlength="100" required>
+                <label>Verification code
+                    <input id="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" minlength="6" required>
                 </label>
-                <label>Phone
-                    <input id="phone" type="tel" autocomplete="tel" maxlength="30" required>
-                </label>
+
+                <div class="otp-actions">
+                    <button id="confirmButton" class="primary-button" type="submit">Confirm appointment</button>
+                    <button id="backButton" class="secondary-button" type="button">Change details</button>
+                </div>
             </div>
 
-            <label>Email
-                <input id="email" type="email" autocomplete="email" maxlength="254" required>
-            </label>
-
-            <input id="website" class="honeypot" type="text" tabindex="-1" autocomplete="off">
-
-            <div id="bookingMessage" class="booking-message" role="status"></div>
-            <button id="bookButton" class="primary-button" type="submit" disabled>Book appointment</button>
+            <div id="bookingMessage" class="booking-message" role="status" aria-live="polite"></div>
         </form>
 
-        <div class="booking-note">Your selected time is checked again when you submit. If someone books it first, you'll be asked to choose another available time.</div>
+        <div class="booking-note">The verification code is generated on the server, stored only as a protected hash, expires after 10 minutes, and is limited to 5 attempts. The calendar is checked again before the appointment is created.</div>
     </div>
 
     <div class="demo-footer">
