@@ -195,7 +195,7 @@ def confirm_booking(request: Request, payload: BookingConfirmRequest):
             _set_otp_cookie(response, response_cookie, request)
             return response
         if message.startswith("Too many incorrect verification attempts"):
-            response = JSONResponse({"detail": message}, status_code=400)
+            response = JSONResponse({"detail": message}, status_code=429)
             response.delete_cookie(COOKIE_NAME, path="/api/bookings")
             return response
         raise HTTPException(status_code=400, detail=message)
