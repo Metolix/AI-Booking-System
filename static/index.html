@@ -4,37 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0b0b0c">
-    <title>Luxe Hair Studio — AI Support Demo</title>
+    <title>AI Support Demo</title>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 <div class="demo-page">
     <header class="demo-notice">
         <div class="demo-brand">
-            <div class="demo-badge">DEMO</div>
+            <div class="demo-badge" data-config="business.demo_label">DEMO</div>
             <div>
-                <strong>Luxe Hair Studio</strong>
+                <strong data-config="business.name">Business</strong>
                 <span>AI support & appointment availability</span>
             </div>
         </div>
-        <div class="demo-notice-copy">Ask questions, check availability, then book securely.</div>
-        <a class="book-back" href="/book">Book appointment <span>↗</span></a>
+        <div class="demo-notice-copy" data-config="business.demo_description">Ask questions, check availability, then book securely.</div>
+        <a class="book-back" data-config-href="booking.path" href="/book">Book appointment <span>↗</span></a>
     </header>
 
     <main class="home-shell">
         <section class="chat-wrapper" aria-label="AI support chat">
             <div class="chat-header">
-                <div class="business-icon">L</div>
+                <div class="business-icon" data-config="branding.logo_text">B</div>
                 <div class="chat-title">
-                    <div class="business-name">Luxe AI Assistant</div>
-                    <div class="status"><span></span>Online · Demo assistant</div>
+                    <div class="business-name" data-config-template="business.assistant_name">Business Assistant</div>
+                    <div class="status"><span></span>Online · AI assistant</div>
                 </div>
                 <div class="header-label">AI SUPPORT</div>
             </div>
 
             <div id="messages" class="messages">
                 <div class="welcome-block">
-                    <div class="welcome-eyebrow">LUXE HAIR STUDIO</div>
+                    <div class="welcome-eyebrow" data-config="business.name">BUSINESS</div>
                     <h1>How can we help?</h1>
                     <p>Ask about services, hours or appointment availability.</p>
                     <div class="suggestions" aria-label="Suggested questions">
@@ -43,7 +43,7 @@
                         <button type="button" data-message="What appointments are available?">Availability</button>
                     </div>
                 </div>
-                <div class="message assistant">Hi! 👋 I can answer questions about Luxe Hair Studio and check appointment availability. When you're ready, you can <a href="/book">book an appointment</a>.</div>
+                <div id="welcomeMessage" class="message assistant">Hi! 👋 I can answer questions about this business and check appointment availability. When you're ready, you can <a href="/book">book an appointment</a>.</div>
             </div>
 
             <div class="input-area">
@@ -57,8 +57,8 @@
     </main>
 
     <footer class="demo-footer">
-        <span>Demo environment · Sample business data · AI-generated responses</span>
-        <span>Do not enter sensitive information.</span>
+        <span data-config="footer.left">Demo environment · Sample business data · AI-generated responses</span>
+        <span data-config="footer.right">Do not enter sensitive information.</span>
     </footer>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
