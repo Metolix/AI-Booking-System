@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0b0b0c">
-    <title>Luxe Hair Studio — Book Appointment</title>
+    <title>Book Appointment</title>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 <div class="demo-page booking-page">
     <header class="demo-notice">
         <div class="demo-brand">
-            <div class="demo-badge">DEMO</div>
+            <div class="demo-badge" data-config="business.demo_label">DEMO</div>
             <div>
-                <strong>Luxe Hair Studio</strong>
+                <strong data-config="business.name">Business</strong>
                 <span>Secure appointment booking</span>
             </div>
         </div>
@@ -25,10 +25,10 @@
         <div class="booking-card-header">
             <div>
                 <div class="eyebrow">APPOINTMENT</div>
-                <h1>Book your appointment</h1>
-                <p class="booking-intro">Choose a service and time. We'll verify your email before confirming the appointment.</p>
+                <h1 data-config="booking.title">Book your appointment</h1>
+                <p class="booking-intro" data-config="booking.description">Choose a service and time. We'll verify your email before confirming the appointment.</p>
             </div>
-            <div class="sync-pill"><span></span> Live calendar</div>
+            <div class="sync-pill"><span></span> <span data-config="booking.calendar_label">Live calendar</span></div>
         </div>
 
         <div class="booking-progress" aria-hidden="true">
@@ -101,7 +101,7 @@
     </main>
 
     <footer class="demo-footer">
-        <span>Demo environment · Sample business data</span>
+        <span data-config="footer.left">Demo environment · Sample business data</span>
         <span><a href="/">← Back to the AI assistant</a></span>
     </footer>
 </div>
