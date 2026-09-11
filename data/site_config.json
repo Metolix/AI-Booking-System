@@ -1,0 +1,40 @@
+{
+  "business": {
+    "name": "Luxe Hair Studio",
+    "short_name": "Luxe",
+    "type": "Hair salon",
+    "tagline": "Simple booking. Better support.",
+    "assistant_name": "Luxe Assistant",
+    "initial_message": "Hi! 👋 I can answer questions about Luxe Hair Studio and check appointment availability. Ready to book?",
+    "demo_label": "DEMO",
+    "demo_title": "This is a demonstration website.",
+    "demo_description": "The AI assistant answers questions and checks appointment availability. Bookings are completed through the booking form."
+  },
+  "booking": {
+    "path": "/book",
+    "enabled": true,
+    "title": "Book your appointment",
+    "description": "Select an available time, enter your details, then verify your email.",
+    "calendar_label": "Live calendar",
+    "verification_expiry_minutes": 10,
+    "max_verification_attempts": 5,
+    "max_days_ahead": 60,
+    "timezone": "America/Toronto"
+  },
+  "branding": {
+    "accent": "#ffffff",
+    "background": "#080808",
+    "surface": "#111111",
+    "logo_text": "L"
+  },
+  "contact": {
+    "phone": "+1 555 123 4567",
+    "email": "hello@luxehair.com",
+    "website": "https://luxehair.com",
+    "instagram": "@luxehairstudio"
+  },
+  "footer": {
+    "left": "Demo environment · Sample business data",
+    "right": "AI-generated responses · Do not enter sensitive information."
+  }
+}
