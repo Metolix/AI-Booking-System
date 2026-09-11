@@ -5,6 +5,50 @@ const suggestions = document.querySelectorAll("[data-message]");
 
 let history = [];
 
+function getConfigValue(config, path) {
+    return path.split(".").reduce((value, key) => value?.[key], config);
+}
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"]/g, character => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[character]));
+}
+
+function escapeAttribute(value) {
+    return String(value).replace(/[^a-zA-Z0-9/_-]/g, "");
+}
+
+async function loadSiteConfig() {
+    try {
+        const response = await fetch("/api/site-config");
+        if (!response.ok) return;
+        const config = await response.json();
+
+        document.querySelectorAll("[data-config]").forEach(element => {
+            const value = getConfigValue(config, element.dataset.config);
+            if (value !== undefined && value !== null) element.textContent = value;
+        });
+
+        document.querySelectorAll("[data-config-href]").forEach(element => {
+            const value = getConfigValue(config, element.dataset.configHref);
+            if (value) element.href = value;
+        });
+
+        const businessName = getConfigValue(config, "business.name") || "Business";
+        const assistantName = getConfigValue(config, "business.assistant_name") || `${businessName} Assistant`;
+        const initial = getConfigValue(config, "business.initial_message");
+        const bookingPath = getConfigValue(config, "booking.path") || "/book";
+
+        document.title = `${businessName} — AI Support`;
+        document.querySelectorAll(".business-name").forEach(element => { element.textContent = assistantName; });
+
+        const welcome = document.getElementById("welcomeMessage");
+        if (welcome && initial) {
+            welcome.innerHTML = `${escapeHtml(initial)} When you're ready, you can <a href="${escapeAttribute(bookingPath)}">book an appointment</a>.`;
+        }
+    } catch {
+    }
+}
+
 function addMessage(text, role) {
     const element = document.createElement("div");
     element.className = `message ${role}`;
@@ -40,9 +84,7 @@ async function sendMessage() {
         });
         const data = await response.json();
         if (!response.ok) {
-            if (response.status === 429) {
-                throw new Error("You're sending messages a little too quickly. Please wait a moment and try again.");
-            }
+            if (response.status === 429) throw new Error("You're sending messages a little too quickly. Please wait a moment and try again.");
             throw new Error(data.detail || "Something went wrong.");
         }
 
@@ -76,4 +118,5 @@ input.addEventListener("keydown", event => {
     }
 });
 
+loadSiteConfig();
 resizeInput();
