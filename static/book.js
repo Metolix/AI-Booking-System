@@ -23,7 +23,7 @@ function formatTime(value) {
 
 function setMessage(text, error = false) {
     message.textContent = text;
-    message.style.color = error ? "#b91c1c" : "#555";
+    message.style.color = error ? "#e57a7a" : "#77777d";
 }
 
 function bookingPayload() {
@@ -158,12 +158,16 @@ form.addEventListener("submit", async event => {
     } catch (error) {
         setMessage(error.message, true);
 
+        if (error.status === 429) {
+            confirmButton.disabled = true;
+            backButton.focus();
+            return;
+        }
+
+        confirmButton.disabled = false;
         if (error.status === 400) {
-            confirmButton.disabled = false;
             code.focus();
             code.select();
-        } else {
-            confirmButton.disabled = false;
         }
     }
 });
